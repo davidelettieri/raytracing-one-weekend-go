@@ -24,9 +24,9 @@ func rayColor(ray *ray.Ray) vec.Color {
 
 func hitSphere(center *vec.Point3, radius float64, ray *ray.Ray) float64 {
 	origin := ray.GetOrigin()
-	oc := center.Subtract(*origin)
+	oc := center.Subtract(origin)
 	a := ray.GetDirection().LengthSquared()
-	h := vec.Dot(*ray.GetDirection(), oc)
+	h := vec.Dot(ray.GetDirection(), oc)
 	c := oc.LengthSquared() - radius*radius
 	discriminant := h*h - a*c
 	if discriminant < 0 {
@@ -75,7 +75,7 @@ func main() {
 		for i := range image_width {
 			pixel_center := pixel00_loc.Add(pixel_delta_u.Multiply(float64(i))).Add(pixel_delta_v.Multiply(float64(j)))
 			ray_direction := pixel_center.Subtract(camera_center)
-			ray := ray.NewRay(&camera_center, &ray_direction)
+			ray := ray.NewRay(camera_center, ray_direction)
 			pixel_color := rayColor(&ray)
 			vec.WriteColor(*os.Stdout, pixel_color)
 		}

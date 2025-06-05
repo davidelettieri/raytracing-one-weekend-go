@@ -20,7 +20,7 @@ func (h *HitRecord) SetFaceNormal(ray ray.Ray, outward_normal vec.Vec3) error {
 		return errors.New("length of outward normal must be 1")
 	}
 
-	h.front_face = vec.Dot(*ray.GetDirection(), outward_normal) < 0
+	h.front_face = vec.Dot(ray.GetDirection(), outward_normal) < 0
 	if h.front_face {
 		h.normal = outward_normal
 	} else {
@@ -40,10 +40,10 @@ type Sphere struct {
 }
 
 func (s Sphere) Hit(ray ray.Ray, ray_tmin, ray_tmax float64) (HitRecord, bool) {
-	oc := s.center.Subtract(*ray.GetOrigin())
+	oc := s.center.Subtract(ray.GetOrigin())
 	rayDirection := ray.GetDirection()
 	a := rayDirection.LengthSquared()
-	h := vec.Dot(*rayDirection, oc)
+	h := vec.Dot(rayDirection, oc)
 	c := oc.LengthSquared() - s.radius*s.radius
 
 	discriminant := h*h - a*c
