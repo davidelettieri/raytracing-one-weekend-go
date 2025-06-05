@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"os"
 
 	"davidelettieri.it/raytracing/ray"
@@ -9,19 +10,30 @@ import (
 )
 
 func rayColor(ray *ray.Ray) vec.Color {
+	center := vec.NewPoint3(0, 0, -1)
+	t := hitSphere(&center, 0.5, ray)
+	if t > 0.0 {
+		N := ray.At(t).Subtract(vec.NewVec3(0, 0, -1)).Unit()
+		return vec.NewColor(N.X()+1, N.Y()+1, N.Z()+1).Multiply(0.5)
+	}
+
 	unit_direction := ray.GetDirection().Unit()
 	a := 0.5 * (unit_direction.Y() + 1)
 	return vec.NewColor(1.0, 1.0, 1.0).Multiply(1.0 - a).Add(vec.NewColor(0.5, 0.7, 1.0).Multiply(a))
 }
 
-func hitSphere(center *vec.Point3, radius float64, ray *ray.Ray) bool {
+func hitSphere(center *vec.Point3, radius float64, ray *ray.Ray) float64 {
 	origin := ray.GetOrigin()
 	oc := center.Subtract(*origin)
 	a := vec.Dot(*ray.GetDirection(), *ray.GetDirection())
 	b := -2.0 * vec.Dot(*ray.GetDirection(), oc)
 	c := vec.Dot(oc, oc) - radius*radius
 	discriminant := b*b - 4*a*c
-	return discriminant >= 0
+	if discriminant < 0 {
+		return -1.0
+	} else {
+		return (-b - math.Sqrt(discriminant)) / (2.0 * a)
+	}
 }
 
 func main() {
