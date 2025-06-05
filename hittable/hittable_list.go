@@ -1,6 +1,9 @@
 package hittable
 
-import "github.com/davidelettieri/raytracing-one-weekend-go/ray"
+import (
+	"github.com/davidelettieri/raytracing-one-weekend-go/ray"
+	"github.com/davidelettieri/raytracing-one-weekend-go/utils"
+)
 
 type HittableList struct {
 	objects []Hittable
@@ -23,12 +26,12 @@ func (h *HittableList) Clear() {
 	h.objects = []Hittable{}
 }
 
-func (hl HittableList) Hit(ray ray.Ray, ray_tmin, ray_tmax float64) (HitRecord, bool) {
+func (hl HittableList) Hit(ray ray.Ray, interval utils.Interval) (HitRecord, bool) {
 	hit_anything := false
-	closest_so_far := ray_tmax
+	closest_so_far := interval.GetMax()
 	hit_record := HitRecord{}
 	for _, obj := range hl.objects {
-		obj_hit_record, hit := obj.Hit(ray, ray_tmin, closest_so_far)
+		obj_hit_record, hit := obj.Hit(ray, utils.NewInterval(interval.GetMin(), closest_so_far))
 
 		if hit {
 			hit_anything = true

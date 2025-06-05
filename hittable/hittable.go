@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/davidelettieri/raytracing-one-weekend-go/ray"
+	"github.com/davidelettieri/raytracing-one-weekend-go/utils"
 	"github.com/davidelettieri/raytracing-one-weekend-go/vec"
 )
 
@@ -34,5 +35,5 @@ func (h *HitRecord) SetFaceNormal(ray ray.Ray, outward_normal vec.Vec3) error {
 }
 
 type Hittable interface {
-	Hit(ray ray.Ray, ray_tmin, ray_tmax float64) (HitRecord, bool)
+	Hit(ray ray.Ray, interval utils.Interval) (HitRecord, bool)
 }

@@ -7,11 +7,12 @@ import (
 
 	"github.com/davidelettieri/raytracing-one-weekend-go/hittable"
 	"github.com/davidelettieri/raytracing-one-weekend-go/ray"
+	"github.com/davidelettieri/raytracing-one-weekend-go/utils"
 	"github.com/davidelettieri/raytracing-one-weekend-go/vec"
 )
 
 func rayColor(ray ray.Ray, world hittable.Hittable) vec.Color {
-	hit_record, hit := world.Hit(ray, 0, math.Inf(1))
+	hit_record, hit := world.Hit(ray, utils.NewInterval(0, math.Inf(1)))
 	if hit {
 		return hit_record.GetNormal().Add(vec.NewColor(1, 1, 1)).Multiply(0.5)
 	}

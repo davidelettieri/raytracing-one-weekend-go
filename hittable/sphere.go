@@ -4,6 +4,7 @@ import (
 	"math"
 
 	"github.com/davidelettieri/raytracing-one-weekend-go/ray"
+	"github.com/davidelettieri/raytracing-one-weekend-go/utils"
 	"github.com/davidelettieri/raytracing-one-weekend-go/vec"
 )
 
@@ -12,7 +13,7 @@ type Sphere struct {
 	radius float64
 }
 
-func (s Sphere) Hit(ray ray.Ray, ray_tmin, ray_tmax float64) (HitRecord, bool) {
+func (s Sphere) Hit(ray ray.Ray, interval utils.Interval) (HitRecord, bool) {
 	oc := s.center.Subtract(ray.GetOrigin())
 	rayDirection := ray.GetDirection()
 	a := rayDirection.LengthSquared()
@@ -28,9 +29,9 @@ func (s Sphere) Hit(ray ray.Ray, ray_tmin, ray_tmax float64) (HitRecord, bool) {
 
 	root := (h - sqrtd) / a
 
-	if root <= ray_tmin || root >= ray_tmax {
+	if !interval.Surrounds(root) {
 		root = (h + sqrtd) / a
-		if root <= ray_tmin || root >= ray_tmax {
+		if !interval.Surrounds(root) {
 			return HitRecord{}, false
 		}
 	}
