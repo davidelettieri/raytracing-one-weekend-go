@@ -27,18 +27,18 @@ func (h *HittableList) Clear() {
 }
 
 func (hl HittableList) Hit(ray ray.Ray, interval utils.Interval) (HitRecord, bool) {
-	hit_anything := false
-	closest_so_far := interval.GetMax()
-	hit_record := HitRecord{}
+	hitAnything := false
+	closestSoFar := interval.Max()
+	hitRecord := HitRecord{}
 	for _, obj := range hl.objects {
-		obj_hit_record, hit := obj.Hit(ray, utils.NewInterval(interval.GetMin(), closest_so_far))
+		objHitRecord, hit := obj.Hit(ray, utils.NewInterval(interval.Min(), closestSoFar))
 
 		if hit {
-			hit_anything = true
-			closest_so_far = obj_hit_record.t
-			hit_record = obj_hit_record
+			hitAnything = true
+			closestSoFar = objHitRecord.t
+			hitRecord = objHitRecord
 		}
 	}
 
-	return hit_record, hit_anything
+	return hitRecord, hitAnything
 }

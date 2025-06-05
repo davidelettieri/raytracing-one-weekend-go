@@ -9,26 +9,26 @@ import (
 )
 
 type HitRecord struct {
-	p          vec.Point3
-	normal     vec.Vec3
-	t          float64
-	front_face bool
+	p         vec.Point3
+	normal    vec.Vec3
+	t         float64
+	frontFace bool
 }
 
-func (h HitRecord) GetNormal() vec.Vec3 {
+func (h HitRecord) Normal() vec.Vec3 {
 	return h.normal
 }
 
-func (h *HitRecord) SetFaceNormal(ray ray.Ray, outward_normal vec.Vec3) error {
-	if outward_normal.LengthSquared() != 1 {
+func (h *HitRecord) SetFaceNormal(ray ray.Ray, outwardNormal vec.Vec3) error {
+	if outwardNormal.LengthSquared() != 1 {
 		return errors.New("length of outward normal must be 1")
 	}
 
-	h.front_face = vec.Dot(ray.GetDirection(), outward_normal) < 0
-	if h.front_face {
-		h.normal = outward_normal
+	h.frontFace = vec.Dot(ray.Direction(), outwardNormal) < 0
+	if h.frontFace {
+		h.normal = outwardNormal
 	} else {
-		h.normal = outward_normal.Negate()
+		h.normal = outwardNormal.Negate()
 	}
 
 	return nil

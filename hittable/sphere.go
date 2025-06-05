@@ -14,8 +14,8 @@ type Sphere struct {
 }
 
 func (s Sphere) Hit(ray ray.Ray, interval utils.Interval) (HitRecord, bool) {
-	oc := s.center.Subtract(ray.GetOrigin())
-	rayDirection := ray.GetDirection()
+	oc := s.center.Subtract(ray.Origin())
+	rayDirection := ray.Direction()
 	a := rayDirection.LengthSquared()
 	h := vec.Dot(rayDirection, oc)
 	c := oc.LengthSquared() - s.radius*s.radius
@@ -44,8 +44,8 @@ func (s Sphere) Hit(ray ray.Ray, interval utils.Interval) (HitRecord, bool) {
 		normal: p.Subtract(s.center).Divide(s.radius),
 	}
 
-	outward_normal := rec.p.Subtract(s.center).Divide(s.radius)
-	rec.SetFaceNormal(ray, outward_normal)
+	outwardNormal := rec.p.Subtract(s.center).Divide(s.radius)
+	rec.SetFaceNormal(ray, outwardNormal)
 
 	return rec, true
 }

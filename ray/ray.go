@@ -14,11 +14,11 @@ func NewRay(origin vec.Point3, direction vec.Vec3) Ray {
 	}
 }
 
-func (r Ray) GetOrigin() vec.Point3 {
+func (r Ray) Origin() vec.Point3 {
 	return r.origin
 }
 
-func (r Ray) GetDirection() vec.Vec3 {
+func (r Ray) Direction() vec.Vec3 {
 	return r.direction
 }
 

@@ -7,11 +7,11 @@ type Interval struct {
 	max float64
 }
 
-func (i Interval) GetMax() float64 {
+func (i Interval) Max() float64 {
 	return i.max
 }
 
-func (i Interval) GetMin() float64 {
+func (i Interval) Min() float64 {
 	return i.min
 }
 
