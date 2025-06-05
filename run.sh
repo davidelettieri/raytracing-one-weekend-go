@@ -1,2 +1,2 @@
 go build
-./raytracing > image.ppm
+./raytracing-one-weekend-go > image.ppm

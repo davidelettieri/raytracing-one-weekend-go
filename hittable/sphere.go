@@ -20,6 +20,10 @@ func (s Sphere) Hit(ray ray.Ray, ray_tmin, ray_tmax float64) (HitRecord, bool) {
 	c := oc.LengthSquared() - s.radius*s.radius
 
 	discriminant := h*h - a*c
+	if discriminant < 0 {
+		return HitRecord{}, false
+	}
+
 	sqrtd := math.Sqrt(discriminant)
 
 	root := (h - sqrtd) / a

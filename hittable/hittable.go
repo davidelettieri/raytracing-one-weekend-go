@@ -14,6 +14,10 @@ type HitRecord struct {
 	front_face bool
 }
 
+func (h HitRecord) GetNormal() vec.Vec3 {
+	return h.normal
+}
+
 func (h *HitRecord) SetFaceNormal(ray ray.Ray, outward_normal vec.Vec3) error {
 	if outward_normal.LengthSquared() != 1 {
 		return errors.New("length of outward normal must be 1")

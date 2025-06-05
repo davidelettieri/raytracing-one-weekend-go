@@ -5,35 +5,20 @@ import (
 	"math"
 	"os"
 
+	"github.com/davidelettieri/raytracing-one-weekend-go/hittable"
 	"github.com/davidelettieri/raytracing-one-weekend-go/ray"
 	"github.com/davidelettieri/raytracing-one-weekend-go/vec"
 )
 
-func rayColor(ray *ray.Ray) vec.Color {
-	center := vec.NewPoint3(0, 0, -1)
-	t := hitSphere(&center, 0.5, ray)
-	if t > 0.0 {
-		N := ray.At(t).Subtract(vec.NewVec3(0, 0, -1)).Unit()
-		return vec.NewColor(N.X()+1, N.Y()+1, N.Z()+1).Multiply(0.5)
+func rayColor(ray ray.Ray, world hittable.Hittable) vec.Color {
+	hit_record, hit := world.Hit(ray, 0, math.Inf(1))
+	if hit {
+		return hit_record.GetNormal().Add(vec.NewColor(1, 1, 1)).Multiply(0.5)
 	}
 
 	unit_direction := ray.GetDirection().Unit()
 	a := 0.5 * (unit_direction.Y() + 1)
 	return vec.NewColor(1.0, 1.0, 1.0).Multiply(1.0 - a).Add(vec.NewColor(0.5, 0.7, 1.0).Multiply(a))
-}
-
-func hitSphere(center *vec.Point3, radius float64, ray *ray.Ray) float64 {
-	origin := ray.GetOrigin()
-	oc := center.Subtract(origin)
-	a := ray.GetDirection().LengthSquared()
-	h := vec.Dot(ray.GetDirection(), oc)
-	c := oc.LengthSquared() - radius*radius
-	discriminant := h*h - a*c
-	if discriminant < 0 {
-		return -1.0
-	} else {
-		return (h - math.Sqrt(discriminant)) / a
-	}
 }
 
 func main() {
@@ -46,6 +31,9 @@ func main() {
 	if image_height < 1 {
 		image_height = 1
 	}
+
+	world := hittable.NewHittableList(hittable.NewSphere(vec.NewPoint3(0, 0, -1), 0.5))
+	world.Add(hittable.NewSphere(vec.NewPoint3(0, -100.5, -1), 100))
 
 	// Camera
 
@@ -76,7 +64,7 @@ func main() {
 			pixel_center := pixel00_loc.Add(pixel_delta_u.Multiply(float64(i))).Add(pixel_delta_v.Multiply(float64(j)))
 			ray_direction := pixel_center.Subtract(camera_center)
 			ray := ray.NewRay(camera_center, ray_direction)
-			pixel_color := rayColor(&ray)
+			pixel_color := rayColor(ray, world)
 			vec.WriteColor(*os.Stdout, pixel_color)
 		}
 	}
