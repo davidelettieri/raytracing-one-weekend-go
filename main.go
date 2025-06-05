@@ -5,8 +5,8 @@ import (
 	"math"
 	"os"
 
-	"davidelettieri.it/raytracing/ray"
-	"davidelettieri.it/raytracing/vec"
+	"github.com/davidelettieri/raytracing-one-weekend-go/ray"
+	"github.com/davidelettieri/raytracing-one-weekend-go/vec"
 )
 
 func rayColor(ray *ray.Ray) vec.Color {

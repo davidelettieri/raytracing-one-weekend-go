@@ -1,6 +1,6 @@
 package ray
 
-import "davidelettieri.it/raytracing/vec"
+import "github.com/davidelettieri/raytracing-one-weekend-go/vec"
 
 type Ray struct {
 	origin    *vec.Point3

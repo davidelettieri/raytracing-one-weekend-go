@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"davidelettieri.it/raytracing/vec"
+	"github.com/davidelettieri/raytracing-one-weekend-go/vec"
 )
 
 func main() {
