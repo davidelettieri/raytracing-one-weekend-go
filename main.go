@@ -25,14 +25,14 @@ func rayColor(ray *ray.Ray) vec.Color {
 func hitSphere(center *vec.Point3, radius float64, ray *ray.Ray) float64 {
 	origin := ray.GetOrigin()
 	oc := center.Subtract(*origin)
-	a := vec.Dot(*ray.GetDirection(), *ray.GetDirection())
-	b := -2.0 * vec.Dot(*ray.GetDirection(), oc)
-	c := vec.Dot(oc, oc) - radius*radius
-	discriminant := b*b - 4*a*c
+	a := ray.GetDirection().LengthSquared()
+	h := vec.Dot(*ray.GetDirection(), oc)
+	c := oc.LengthSquared() - radius*radius
+	discriminant := h*h - a*c
 	if discriminant < 0 {
 		return -1.0
 	} else {
-		return (-b - math.Sqrt(discriminant)) / (2.0 * a)
+		return (h - math.Sqrt(discriminant)) / a
 	}
 }
 
