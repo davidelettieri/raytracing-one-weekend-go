@@ -1,4 +1,4 @@
-package main
+package ray
 
 import "davidelettieri.it/raytracing/vec"
 

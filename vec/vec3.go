@@ -69,3 +69,7 @@ func (v Vec3) Length() float64 {
 func (v Vec3) Unit() Vec3 {
 	return v.Divide(v.Length())
 }
+
+func Dot(u, v Vec3) float64 {
+	return u.e[0]*v.e[0] + u.e[1]*v.e[1] + u.e[2]*v.e[2]
+}
