@@ -1,21 +1,86 @@
 package camera
 
 import (
+	"fmt"
+	"math"
+	"os"
+
 	"github.com/davidelettieri/raytracing-one-weekend-go/hittable"
 	"github.com/davidelettieri/raytracing-one-weekend-go/ray"
+	"github.com/davidelettieri/raytracing-one-weekend-go/utils"
+	"github.com/davidelettieri/raytracing-one-weekend-go/vec"
 )
 
 type Camera struct {
+	aspectRatio float64
+	imageWidth  int
+	imageHeight int
+	center      vec.Point3
+	pixel00Loc  vec.Point3
+	pixelDeltaU vec.Vec3
+	pixelDeltaV vec.Vec3
+}
+
+func NewCamera(aspectRatio float64, imageWidth int) Camera {
+	return Camera{
+		aspectRatio: aspectRatio,
+		imageWidth:  imageWidth,
+	}
 }
 
 func (c Camera) Render(world hittable.Hittable) {
+	c.initialize()
 
+	fmt.Print("P3\n", c.imageWidth, " ", c.imageHeight, "\n255\n")
+
+	for j := range c.imageHeight {
+		println("\nScanlines remaining: ", c.imageHeight-j, " ")
+		for i := range c.imageWidth {
+			pixelCenter := c.pixel00Loc.Add(c.pixelDeltaU.Multiply(float64(i))).Add(c.pixelDeltaV.Multiply(float64(j)))
+			rayDirection := pixelCenter.Subtract(c.center)
+			ray := ray.NewRay(c.center, rayDirection)
+			pixelColor := rayColor(ray, world)
+			vec.WriteColor(*os.Stdout, pixelColor)
+		}
+	}
+
+	println("\rDone.			\n")
 }
 
-func (c Camera) initialize() {
+func (c *Camera) initialize() {
+	// Calculate the image height, and ensure that it's at least 1.
+	c.imageHeight = int(float64(c.imageWidth) / c.aspectRatio)
+	if c.imageHeight < 1 {
+		c.imageHeight = 1
+	}
 
+	// Camera
+
+	focalLength := 1.0
+	viewportHeight := 2.0
+	viewportWidth := viewportHeight * (float64(c.imageWidth) / float64(c.imageHeight))
+	c.center = vec.NewPoint3(0, 0, 0)
+
+	// Calculate the vectors across the horizontal and down the vertical viewport edges.
+	viewportU := vec.NewVec3(viewportWidth, 0, 0)
+	viewportV := vec.NewVec3(0, -viewportHeight, 0)
+
+	// Calculate the horizontal and vertical delta vectors from pixel to pixel.
+	c.pixelDeltaU = viewportU.Divide(float64(c.imageWidth))
+	c.pixelDeltaV = viewportV.Divide(float64(c.imageHeight))
+
+	// Calculate the location of the upper left pixel.
+	viewportUpperLeft := c.center.Subtract(vec.NewVec3(0, 0, focalLength)).Subtract(viewportU.Divide(2)).Subtract(viewportV.Divide(2))
+	c.pixel00Loc = viewportUpperLeft.Add(c.pixelDeltaU.Add(c.pixelDeltaV).Multiply(0.5))
 }
 
-func (c Camera) rayColor(ray ray.Ray, world hittable.Hittable) {
+func rayColor(ray ray.Ray, world hittable.Hittable) vec.Color {
+	hitRecord, hit := world.Hit(ray, utils.NewInterval(0, math.Inf(1)))
+	if hit {
+		return hitRecord.Normal().Add(vec.NewColor(1, 1, 1)).Multiply(0.5)
+	}
 
+	unitDirection := ray.Direction().Unit()
+	a := 0.5 * (unitDirection.Y() + 1)
+	return vec.NewColor(1.0, 1.0, 1.0).Multiply(1.0 - a).Add(vec.NewColor(0.5, 0.7, 1.0).Multiply(a))
 }
