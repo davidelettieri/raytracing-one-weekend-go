@@ -12,19 +12,22 @@ import (
 )
 
 type Camera struct {
-	aspectRatio float64
-	imageWidth  int
-	imageHeight int
-	center      vec.Point3
-	pixel00Loc  vec.Point3
-	pixelDeltaU vec.Vec3
-	pixelDeltaV vec.Vec3
+	aspectRatio       float64
+	imageWidth        int
+	samplesPerPixel   int
+	imageHeight       int
+	pixelSamplesScale float64
+	center            vec.Point3
+	pixel00Loc        vec.Point3
+	pixelDeltaU       vec.Vec3
+	pixelDeltaV       vec.Vec3
 }
 
-func NewCamera(aspectRatio float64, imageWidth int) Camera {
+func NewCamera(aspectRatio float64, imageWidth, samplesPerPixel int) Camera {
 	return Camera{
-		aspectRatio: aspectRatio,
-		imageWidth:  imageWidth,
+		aspectRatio:     aspectRatio,
+		imageWidth:      imageWidth,
+		samplesPerPixel: samplesPerPixel,
 	}
 }
 
@@ -36,11 +39,13 @@ func (c Camera) Render(world hittable.Hittable) {
 	for j := range c.imageHeight {
 		println("\nScanlines remaining: ", c.imageHeight-j, " ")
 		for i := range c.imageWidth {
-			pixelCenter := c.pixel00Loc.Add(c.pixelDeltaU.Multiply(float64(i))).Add(c.pixelDeltaV.Multiply(float64(j)))
-			rayDirection := pixelCenter.Subtract(c.center)
-			ray := ray.NewRay(c.center, rayDirection)
-			pixelColor := rayColor(ray, world)
-			vec.WriteColor(*os.Stdout, pixelColor)
+			pixelColor := vec.NewColor(0, 0, 0)
+			for range c.samplesPerPixel {
+				ray := c.getRay(i, j)
+				pixelColor = pixelColor.Add(rayColor(ray, world))
+			}
+
+			vec.WriteColor(*os.Stdout, pixelColor.Multiply(c.pixelSamplesScale))
 		}
 	}
 
@@ -53,6 +58,8 @@ func (c *Camera) initialize() {
 	if c.imageHeight < 1 {
 		c.imageHeight = 1
 	}
+
+	c.pixelSamplesScale = 1.0 / float64(c.samplesPerPixel)
 
 	// Camera
 
@@ -72,6 +79,19 @@ func (c *Camera) initialize() {
 	// Calculate the location of the upper left pixel.
 	viewportUpperLeft := c.center.Subtract(vec.NewVec3(0, 0, focalLength)).Subtract(viewportU.Divide(2)).Subtract(viewportV.Divide(2))
 	c.pixel00Loc = viewportUpperLeft.Add(c.pixelDeltaU.Add(c.pixelDeltaV).Multiply(0.5))
+}
+
+func (c Camera) getRay(i, j int) ray.Ray {
+	offset := sampleSquare()
+	pixelSample := c.pixel00Loc.Add(c.pixelDeltaU.Multiply(float64(i) + offset.X())).Add(c.pixelDeltaV.Multiply(float64(j) + offset.Y()))
+	rayOrigin := c.center
+	rayDirection := pixelSample.Subtract(rayOrigin)
+
+	return ray.NewRay(rayOrigin, rayDirection)
+}
+
+func sampleSquare() vec.Vec3 {
+	return vec.NewVec3(utils.RandomFloat64()-0.5, utils.RandomFloat64()-0.5, 0)
 }
 
 func rayColor(ray ray.Ray, world hittable.Hittable) vec.Color {

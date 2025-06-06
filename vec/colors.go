@@ -3,6 +3,8 @@ package vec
 import (
 	"fmt"
 	"os"
+
+	"github.com/davidelettieri/raytracing-one-weekend-go/utils"
 )
 
 type Color = Vec3
@@ -18,9 +20,11 @@ func WriteColor(out os.File, c Color) {
 	g := c.Y()
 	b := c.Z()
 
-	rbyte := int(255.999 * r)
-	gbyte := int(255.999 * g)
-	bbyte := int(255.999 * b)
+	intensity := utils.NewInterval(0.0, 0.999)
+
+	rbyte := int(256 * intensity.Clamp(r))
+	gbyte := int(256 * intensity.Clamp(g))
+	bbyte := int(256 * intensity.Clamp(b))
 
 	out.WriteString(fmt.Sprint(rbyte, gbyte, bbyte, "\n"))
 }
