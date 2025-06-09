@@ -76,8 +76,8 @@ func (d Dielectric) Scatter(rIn ray.Ray, rec HitRecord) (ray.Ray, vec.Color, boo
 	cosTheta := math.Min(vec.Dot(unitDirection.Negate(), rec.Normal()), 1.0)
 	sinTheta := math.Sqrt(1.0 - cosTheta*cosTheta)
 
-	var direction vec.Vec3
 	cannotRefract := ri*sinTheta > 1.0
+	var direction vec.Vec3
 
 	if cannotRefract || reflectance(cosTheta, ri) > utils.RandomFloat64() {
 		direction = vec.Reflect(unitDirection, rec.Normal())

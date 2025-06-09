@@ -20,6 +20,10 @@ func main() {
 	world.Add(hittable.NewSphere(vec.NewPoint3(-1, 0, -1), 0.5, materialLeft))
 	world.Add(hittable.NewSphere(vec.NewPoint3(-1, 0, -1), 0.4, materialBubble))
 	world.Add(hittable.NewSphere(vec.NewPoint3(1, 0, -1), 0.5, materialRight))
-	cam := camera.NewCamera(16.0/9.0, 400, 100, 50)
+
+	lookFrom := vec.NewPoint3(-2, 2, 1)
+	lookTo := vec.NewPoint3(0, 0, -1)
+	upDirection := vec.NewVec3(0, 1, 0)
+	cam := camera.NewCamera(16.0/9.0, 400, 100, 50, 45, lookFrom, lookTo, upDirection, 10, 3.4)
 	cam.Render(world)
 }

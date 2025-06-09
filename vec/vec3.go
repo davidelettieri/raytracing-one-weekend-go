@@ -98,6 +98,14 @@ func Dot(u, v Vec3) float64 {
 	return u.e[0]*v.e[0] + u.e[1]*v.e[1] + u.e[2]*v.e[2]
 }
 
+func Cross(u, v Vec3) Vec3 {
+	return NewVec3(
+		u.e[1]*v.e[2]-u.e[2]*v.e[1],
+		u.e[2]*v.e[0]-u.e[0]*v.e[2],
+		u.e[0]*v.e[1]-u.e[1]*v.e[0],
+	)
+}
+
 func Random() Vec3 {
 	return NewVec3(utils.RandomFloat64(), utils.RandomFloat64(), utils.RandomFloat64())
 }
@@ -122,4 +130,13 @@ func RandomOnHemisphere(normal Vec3) Vec3 {
 		return onUnitSphere
 	}
 	return onUnitSphere.Negate()
+}
+
+func RandomInUnitDisk() Vec3 {
+	for {
+		p := NewVec3(utils.RandomFloat64InInterval(-1, 1), utils.RandomFloat64InInterval(-1, 1), 0)
+		if p.LengthSquared() < 1 {
+			return p
+		}
+	}
 }
