@@ -2,6 +2,7 @@ package vec
 
 import (
 	"fmt"
+	"math"
 	"os"
 
 	"github.com/davidelettieri/raytracing-one-weekend-go/utils"
@@ -15,12 +16,24 @@ func NewColor(x, y, z float64) Color {
 	}
 }
 
+func linearToGamma(linearComponent float64) float64 {
+	if linearComponent > 0 {
+		return math.Sqrt(linearComponent)
+	}
+	return 0
+}
+
 func WriteColor(out os.File, c Color) {
 	r := c.X()
 	g := c.Y()
 	b := c.Z()
 
-	intensity := utils.NewInterval(0.0, 0.999)
+	// Apply a linear to gamma transform for gamma 2
+	r = linearToGamma(r)
+	g = linearToGamma(g)
+	b = linearToGamma(b)
+
+	intensity := utils.NewInterval(0.000, 0.999)
 
 	rbyte := int(256 * intensity.Clamp(r))
 	gbyte := int(256 * intensity.Clamp(g))
