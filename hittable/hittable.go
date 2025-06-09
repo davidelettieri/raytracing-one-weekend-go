@@ -11,6 +11,7 @@ import (
 type HitRecord struct {
 	p         vec.Point3
 	normal    vec.Vec3
+	material  Material
 	t         float64
 	frontFace bool
 }
@@ -21,6 +22,10 @@ func (h HitRecord) Normal() vec.Vec3 {
 
 func (h HitRecord) Point() vec.Point3 {
 	return h.p
+}
+
+func (h HitRecord) Material() Material {
+	return h.material
 }
 
 func (h *HitRecord) SetFaceNormal(ray ray.Ray, outwardNormal vec.Vec3) error {

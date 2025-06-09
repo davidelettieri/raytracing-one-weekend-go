@@ -103,9 +103,12 @@ func rayColor(r ray.Ray, depth int, world hittable.Hittable) vec.Color {
 
 	rec, hit := world.Hit(r, utils.NewInterval(0.001, math.Inf(1)))
 	if hit {
-		randomUnitVector := vec.RandomUnitVector()
-		direction := rec.Normal().Add(randomUnitVector)
-		return rayColor(ray.NewRay(rec.Point(), direction), depth-1, world).Multiply(0.5)
+		scattered, attenuation, ok := rec.Material().Scatter(r, rec)
+		if ok {
+			return vec.ComponentsMultiply(attenuation, rayColor(scattered, depth-1, world))
+		}
+
+		return vec.NewColor(0, 0, 0)
 	}
 
 	unitDirection := r.Direction().Unit()

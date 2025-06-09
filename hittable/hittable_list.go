@@ -9,12 +9,10 @@ type HittableList struct {
 	objects []Hittable
 }
 
-func NewHittableList(object Hittable) HittableList {
+func NewHittableList() HittableList {
 	hl := HittableList{
 		objects: []Hittable{},
 	}
-
-	hl.Add(object)
 	return hl
 }
 

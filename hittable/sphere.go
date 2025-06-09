@@ -9,8 +9,9 @@ import (
 )
 
 type Sphere struct {
-	center vec.Point3
-	radius float64
+	center   vec.Point3
+	radius   float64
+	material Material
 }
 
 func (s Sphere) Hit(ray ray.Ray, interval utils.Interval) (HitRecord, bool) {
@@ -39,9 +40,10 @@ func (s Sphere) Hit(ray ray.Ray, interval utils.Interval) (HitRecord, bool) {
 	p := ray.At(root)
 
 	rec := HitRecord{
-		t:      root,
-		p:      p,
-		normal: p.Subtract(s.center).Divide(s.radius),
+		t:        root,
+		p:        p,
+		normal:   p.Subtract(s.center).Divide(s.radius),
+		material: s.material,
 	}
 
 	outwardNormal := rec.p.Subtract(s.center).Divide(s.radius)
@@ -50,9 +52,10 @@ func (s Sphere) Hit(ray ray.Ray, interval utils.Interval) (HitRecord, bool) {
 	return rec, true
 }
 
-func NewSphere(center vec.Point3, radius float64) Sphere {
+func NewSphere(center vec.Point3, radius float64, material Material) Sphere {
 	return Sphere{
-		center: center,
-		radius: math.Max(0, radius),
+		center:   center,
+		radius:   math.Max(0, radius),
+		material: material,
 	}
 }

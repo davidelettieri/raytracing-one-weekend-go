@@ -74,6 +74,19 @@ func (v Vec3) Unit() Vec3 {
 	return v.Divide(v.Length())
 }
 
+func (v Vec3) NearZero() bool {
+	s := 1e-8
+	return math.Abs(v.e[0]) < s && math.Abs(v.e[1]) < s && math.Abs(v.e[2]) < s
+}
+
+func ComponentsMultiply(u, v Vec3) Vec3 {
+	return NewVec3(v.e[0]*u.e[0], v.e[1]*u.e[1], v.e[2]*u.e[2])
+}
+
+func Reflect(v Vec3, n Vec3) Vec3 {
+	return v.Subtract(n.Multiply(Dot(v, n) * 2))
+}
+
 func Dot(u, v Vec3) float64 {
 	return u.e[0]*v.e[0] + u.e[1]*v.e[1] + u.e[2]*v.e[2]
 }
