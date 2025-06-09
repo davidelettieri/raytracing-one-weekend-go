@@ -94,13 +94,14 @@ func sampleSquare() vec.Vec3 {
 	return vec.NewVec3(utils.RandomFloat64()-0.5, utils.RandomFloat64()-0.5, 0)
 }
 
-func rayColor(ray ray.Ray, world hittable.Hittable) vec.Color {
-	hitRecord, hit := world.Hit(ray, utils.NewInterval(0, math.Inf(1)))
+func rayColor(r ray.Ray, world hittable.Hittable) vec.Color {
+	hitRecord, hit := world.Hit(r, utils.NewInterval(0, math.Inf(1)))
 	if hit {
-		return hitRecord.Normal().Add(vec.NewColor(1, 1, 1)).Multiply(0.5)
+		direction := vec.RandomOnHemisphere(hitRecord.Normal())
+		return rayColor(ray.NewRay(r.Origin(), direction), world).Multiply(0.5)
 	}
 
-	unitDirection := ray.Direction().Unit()
+	unitDirection := r.Direction().Unit()
 	a := 0.5 * (unitDirection.Y() + 1)
 	return vec.NewColor(1.0, 1.0, 1.0).Multiply(1.0 - a).Add(vec.NewColor(0.5, 0.7, 1.0).Multiply(a))
 }

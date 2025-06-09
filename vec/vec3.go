@@ -1,6 +1,10 @@
 package vec
 
-import "math"
+import (
+	"math"
+
+	"github.com/davidelettieri/raytracing-one-weekend-go/utils"
+)
 
 type Vec3 struct {
 	e [3]float64
@@ -72,4 +76,30 @@ func (v Vec3) Unit() Vec3 {
 
 func Dot(u, v Vec3) float64 {
 	return u.e[0]*v.e[0] + u.e[1]*v.e[1] + u.e[2]*v.e[2]
+}
+
+func Random() Vec3 {
+	return NewVec3(utils.RandomFloat64(), utils.RandomFloat64(), utils.RandomFloat64())
+}
+
+func RandomInInterval(min, max float64) Vec3 {
+	return NewVec3(utils.RandomFloat64InInterval(min, max), utils.RandomFloat64InInterval(min, max), utils.RandomFloat64InInterval(min, max))
+}
+
+func RandomUnitVector() Vec3 {
+	for {
+		p := RandomInInterval(-1, 1)
+		lenqs := p.LengthSquared()
+		if lenqs > 1e-160 && lenqs <= 1 {
+			return p.Divide(math.Sqrt(lenqs))
+		}
+	}
+}
+
+func RandomOnHemisphere(normal Vec3) Vec3 {
+	onUnitSphere := RandomUnitVector()
+	if Dot(onUnitSphere, normal) > 0.0 {
+		return onUnitSphere
+	}
+	return onUnitSphere.Negate()
 }
