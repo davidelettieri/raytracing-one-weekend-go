@@ -7,6 +7,10 @@ type Interval struct {
 	max float64
 }
 
+func (i *Interval) SetMax(max float64) {
+	i.max = max
+}
+
 func (i Interval) Max() float64 {
 	return i.max
 }

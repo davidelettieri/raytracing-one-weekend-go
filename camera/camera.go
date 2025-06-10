@@ -11,6 +11,8 @@ import (
 	"github.com/davidelettieri/raytracing-one-weekend-go/vec"
 )
 
+var hitInterval = utils.NewInterval(0.001, math.Inf(1))
+
 type Camera struct {
 	aspectRatio         float64
 	imageWidth          int
@@ -149,7 +151,7 @@ func rayColor(r ray.Ray, depth int, world hittable.Hittable) vec.Color {
 		return vec.NewColor(0, 0, 0)
 	}
 
-	rec, hit := world.Hit(r, utils.NewInterval(0.001, math.Inf(1)))
+	rec, hit := world.Hit(r, hitInterval)
 	if hit {
 		scattered, attenuation, ok := rec.Material().Scatter(r, rec)
 		if ok {

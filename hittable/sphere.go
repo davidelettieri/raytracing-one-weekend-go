@@ -9,9 +9,11 @@ import (
 )
 
 type Sphere struct {
-	center   vec.Point3
-	radius   float64
-	material Material
+	center        vec.Point3
+	radius        float64
+	material      Material
+	radiusInv     float64
+	radiusSquared float64
 }
 
 func (s Sphere) Hit(ray ray.Ray, interval utils.Interval) (HitRecord, bool) {
@@ -19,7 +21,7 @@ func (s Sphere) Hit(ray ray.Ray, interval utils.Interval) (HitRecord, bool) {
 	rayDirection := ray.Direction()
 	a := rayDirection.LengthSquared()
 	h := vec.Dot(rayDirection, oc)
-	c := oc.LengthSquared() - s.radius*s.radius
+	c := oc.LengthSquared() - s.radiusSquared
 
 	discriminant := h*h - a*c
 	if discriminant < 0 {
@@ -38,15 +40,14 @@ func (s Sphere) Hit(ray ray.Ray, interval utils.Interval) (HitRecord, bool) {
 	}
 
 	p := ray.At(root)
+	outwardNormal := p.Subtract(s.center).Multiply(s.radiusInv)
 
 	rec := HitRecord{
 		t:        root,
 		p:        p,
-		normal:   p.Subtract(s.center).Divide(s.radius),
 		material: s.material,
 	}
 
-	outwardNormal := rec.p.Subtract(s.center).Divide(s.radius)
 	rec.SetFaceNormal(ray, outwardNormal)
 
 	return rec, true
@@ -54,8 +55,10 @@ func (s Sphere) Hit(ray ray.Ray, interval utils.Interval) (HitRecord, bool) {
 
 func NewSphere(center vec.Point3, radius float64, material Material) Sphere {
 	return Sphere{
-		center:   center,
-		radius:   math.Max(0, radius),
-		material: material,
+		center:        center,
+		radius:        math.Max(0, radius),
+		material:      material,
+		radiusInv:     1 / radius,
+		radiusSquared: radius * radius,
 	}
 }
