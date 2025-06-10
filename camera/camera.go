@@ -18,7 +18,7 @@ type Camera struct {
 	maxDepth            int
 	verticalFieldOfView float64
 	lookFrom            vec.Point3
-	lootAt              vec.Point3
+	lookAt              vec.Point3
 	upDirection         vec.Vec3
 	defocusAngle        float64
 	focusDistance       float64
@@ -49,7 +49,7 @@ func NewCamera(
 		maxDepth:            maxDepth,
 		verticalFieldOfView: verticalFieldOfView,
 		lookFrom:            lookFrom,
-		lootAt:              lookAt,
+		lookAt:              lookAt,
 		upDirection:         upDirection,
 		defocusAngle:        defocusAngle,
 		focusDistance:       focusDistance,
@@ -89,18 +89,19 @@ func (c *Camera) initialize() {
 	// Camera
 
 	c.center = c.lookFrom
+
 	theta := utils.DegreesToRadians(c.verticalFieldOfView)
 	h := math.Tan(theta / 2)
 	viewportHeight := 2.0 * h * c.focusDistance
 	viewportWidth := viewportHeight * (float64(c.imageWidth) / float64(c.imageHeight))
 
-	c.w = c.lookFrom.Subtract(c.lootAt).Unit()
+	c.w = c.lookFrom.Subtract(c.lookAt).Unit()
 	c.u = vec.Cross(c.upDirection, c.w).Unit()
 	c.v = vec.Cross(c.w, c.u)
 
 	// Calculate the vectors across the horizontal and down the vertical viewport edges.
 	viewportU := c.u.Multiply(viewportWidth)
-	viewportV := c.v.Negate().Multiply(viewportHeight)
+	viewportV := c.v.Multiply(-viewportHeight)
 
 	// Calculate the horizontal and vertical delta vectors from pixel to pixel.
 	c.pixelDeltaU = viewportU.Divide(float64(c.imageWidth))
@@ -124,7 +125,7 @@ func (c Camera) getRay(i, j int) ray.Ray {
 	pixelSample := c.pixel00Loc.Add(c.pixelDeltaU.Multiply(float64(i) + offset.X())).Add(c.pixelDeltaV.Multiply(float64(j) + offset.Y()))
 	var rayOrigin vec.Point3
 
-	if c.defocusAngle < 0 {
+	if c.defocusAngle <= 0 {
 		rayOrigin = c.center
 	} else {
 		rayOrigin = c.defocusDiskSample()
@@ -144,7 +145,7 @@ func sampleSquare() vec.Vec3 {
 }
 
 func rayColor(r ray.Ray, depth int, world hittable.Hittable) vec.Color {
-	if depth < 0 {
+	if depth <= 0 {
 		return vec.NewColor(0, 0, 0)
 	}
 

@@ -1,7 +1,7 @@
 package hittable
 
 import (
-	"errors"
+	"math"
 
 	"github.com/davidelettieri/raytracing-one-weekend-go/ray"
 	"github.com/davidelettieri/raytracing-one-weekend-go/utils"
@@ -29,8 +29,8 @@ func (h HitRecord) Material() Material {
 }
 
 func (h *HitRecord) SetFaceNormal(ray ray.Ray, outwardNormal vec.Vec3) error {
-	if outwardNormal.LengthSquared() != 1 {
-		return errors.New("length of outward normal must be 1")
+	if math.Abs(outwardNormal.LengthSquared()-1) > 1e-10 {
+		panic("length of outward normal must be 1")
 	}
 
 	h.frontFace = vec.Dot(ray.Direction(), outwardNormal) < 0

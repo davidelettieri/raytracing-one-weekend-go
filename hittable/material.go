@@ -64,33 +64,34 @@ func NewDielectric(refractionIndex float64) Material {
 
 func (d Dielectric) Scatter(rIn ray.Ray, rec HitRecord) (ray.Ray, vec.Color, bool) {
 	attenuation := vec.NewColor(1.0, 1.0, 1.0)
-	var ri float64
+	var refractionRatio float64
 
 	if rec.frontFace {
-		ri = 1.0 / d.refractionIndex
+		refractionRatio = 1.0 / d.refractionIndex
 	} else {
-		ri = d.refractionIndex
+		refractionRatio = d.refractionIndex
 	}
 
 	unitDirection := rIn.Direction().Unit()
 	cosTheta := math.Min(vec.Dot(unitDirection.Negate(), rec.Normal()), 1.0)
 	sinTheta := math.Sqrt(1.0 - cosTheta*cosTheta)
 
-	cannotRefract := ri*sinTheta > 1.0
+	// Check for total internal reflection
+	cannotRefract := refractionRatio*sinTheta > 1.0
 	var direction vec.Vec3
 
-	if cannotRefract || reflectance(cosTheta, ri) > utils.RandomFloat64() {
+	if cannotRefract || reflectance(cosTheta, refractionRatio) > utils.RandomFloat64() {
 		direction = vec.Reflect(unitDirection, rec.Normal())
 	} else {
-		direction = vec.Refract(unitDirection, rec.Normal(), ri)
+		direction = vec.Refract(unitDirection, rec.Normal(), refractionRatio)
 	}
 
-	scattered := ray.NewRay(rec.Point(), direction)
+	scattered := ray.NewRay(rec.Point(), direction.Unit()) // Add .Unit() here
 	return scattered, attenuation, true
 }
 
 func reflectance(cosine, refractionIndex float64) float64 {
-	r0 := (1 - refractionIndex) * (1 + refractionIndex)
+	r0 := (1 - refractionIndex) / (1 + refractionIndex)
 	r0 = r0 * r0
 	return r0 + (1-r0)*math.Pow(1-cosine, 5)
 }

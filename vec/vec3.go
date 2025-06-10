@@ -80,7 +80,7 @@ func (v Vec3) NearZero() bool {
 }
 
 func ComponentsMultiply(u, v Vec3) Vec3 {
-	return NewVec3(v.e[0]*u.e[0], v.e[1]*u.e[1], v.e[2]*u.e[2])
+	return NewVec3(u.e[0]*v.e[0], u.e[1]*v.e[1], u.e[2]*v.e[2])
 }
 
 func Reflect(v Vec3, n Vec3) Vec3 {
@@ -90,8 +90,8 @@ func Reflect(v Vec3, n Vec3) Vec3 {
 func Refract(uv, n Vec3, ETaiOverEtat float64) Vec3 {
 	cosTheta := math.Min(Dot(uv.Negate(), n), 1.0)
 	rOutPerp := uv.Add(n.Multiply(cosTheta)).Multiply(ETaiOverEtat)
-	rOUtParallel := n.Multiply(-math.Sqrt(math.Abs(1.0 - rOutPerp.LengthSquared())))
-	return rOUtParallel.Add(rOutPerp)
+	rOutParallel := n.Multiply(-math.Sqrt(math.Abs(1.0 - rOutPerp.LengthSquared())))
+	return rOutParallel.Add(rOutPerp)
 }
 
 func Dot(u, v Vec3) float64 {
