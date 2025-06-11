@@ -50,6 +50,6 @@ func main() {
 	lookFrom := vec.NewPoint3(13, 2, 2)
 	lookTo := vec.NewPoint3(0, 0, 0)
 	upDirection := vec.NewVec3(0, 1, 0)
-	cam := camera.NewCamera(16.0/9.0, 1200, 10, 50, 20, lookFrom, lookTo, upDirection, 0.6, 10.0)
-	cam.Render(world)
+	cam := camera.NewCamera(16.0/9.0, 1200, 100, 50, 20, lookFrom, lookTo, upDirection, 0.6, 10.0)
+	cam.RenderWithGoRoutines(world)
 }

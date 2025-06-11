@@ -79,6 +79,61 @@ func (c Camera) Render(world hittable.Hittable) {
 	println("\rDone.			\n")
 }
 
+type Pixel struct {
+	i, j  int
+	color vec.Color
+}
+
+func (c Camera) RenderWithGoRoutines(world hittable.Hittable) {
+	c.initialize()
+
+	fmt.Print("P3\n", c.imageWidth, " ", c.imageHeight, "\n255\n")
+
+	channel := make(chan Pixel)
+	pixelCount := c.imageHeight * c.imageWidth
+	image := make([]vec.Color, pixelCount)
+
+	execute(c, world, channel)
+	count := 0
+	for {
+		pixel, ok := <-channel
+
+		if !ok {
+			break
+		}
+
+		image[pixel.j*c.imageWidth+pixel.i] = pixel.color
+		count++
+		if count == pixelCount {
+			close(channel)
+		}
+	}
+
+	for _, el := range image {
+		vec.WriteColor(*os.Stdout, el)
+	}
+
+	println("\rDone.			\n")
+
+}
+
+func execute(c Camera, world hittable.Hittable, channel chan Pixel) {
+	for j := range c.imageHeight {
+		go scanLine(&c, j, &world, channel)
+	}
+}
+
+func scanLine(c *Camera, j int, world *hittable.Hittable, ch chan Pixel) {
+	for i := range c.imageWidth {
+		pixelColor := vec.NewColor(0, 0, 0)
+		for range c.samplesPerPixel {
+			ray := c.getRay(i, j)
+			pixelColor = pixelColor.Add(rayColor(ray, c.maxDepth, *world))
+		}
+		ch <- Pixel{i: i, j: j, color: pixelColor.Multiply(c.pixelSamplesScale)}
+	}
+}
+
 func (c *Camera) initialize() {
 	// Calculate the image height, and ensure that it's at least 1.
 	c.imageHeight = int(float64(c.imageWidth) / c.aspectRatio)
